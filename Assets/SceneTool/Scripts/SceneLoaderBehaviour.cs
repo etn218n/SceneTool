@@ -40,7 +40,7 @@ namespace SceneTool
             if (!UnloadScenesAfterLoad)
                 scenesToUnloadAfterLoad = null; 
 
-            if (!sceneToSetActive.IsValid())
+            if (sceneToSetActive != null && !sceneToSetActive.IsValid())
                 sceneToSetActive = null;
 
             switch (LoadType)

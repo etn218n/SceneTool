@@ -4,5 +4,23 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/Intro.unity
+    guid: 9aa9db23b74cb8b46893c9026256706e
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/StartMenu.unity
+    guid: 977ab475cc9eb2d4a9dcea899573a040
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/SettingMenu.unity
+    guid: 03cf6911b95f4754e8e6e21f9ba348bc
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/Loading.unity
+    guid: 340bcd9576e830347bbbcce85b1a36cb
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/Level1.unity
+    guid: 9e6fe8d4449681040b44a63224b39292
+  - enabled: 1
+    path: Assets/SceneTool/Samples/Scenes/Preload.unity
+    guid: 560bcde23ba877f45a509a01798a9a32
   m_configObjects: {}
