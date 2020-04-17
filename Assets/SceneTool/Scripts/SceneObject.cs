@@ -13,7 +13,7 @@ namespace SceneTool
         [SerializeField] private SceneAsset sceneAsset = null; // What we use in editor to select the scene
     #endif
 
-        public bool IsValid() => !string.IsNullOrEmpty(path) && IsIncludedInBuildSetting();
+        public bool IsValid() => !string.IsNullOrEmpty(path);
 
         [SerializeField]
         private string path = string.Empty; // This should only ever be set during serialization!
