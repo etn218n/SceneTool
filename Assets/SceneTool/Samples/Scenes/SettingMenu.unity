@@ -173,18 +173,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb237a1c65228d409dfa9b4ffce959b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LoadType: 2
+  LoadType: 1
   AllowSceneActivation: 1
   HasTransitionScene: 0
+  UnloadUnusedAssets: 1
   UnloadScenesAfterLoad: 0
   AutomaticallyUnloadTransitionScene: 1
   scenesToLoad:
   - sceneAsset: {fileID: 0}
     path: 
   scenesToUnload:
-  - sceneAsset: {fileID: 0}
-    path: 
-  scenesToUnloadAfterLoad: []
+  - sceneAsset: {fileID: 102900000, guid: 03cf6911b95f4754e8e6e21f9ba348bc, type: 3}
+    path: Assets/SceneTool/Samples/Scenes/SettingMenu.unity
   transitionScene:
     sceneAsset: {fileID: 0}
     path: 

@@ -70,19 +70,17 @@ namespace SceneTool
     {
         #region Fields & Properties
         private readonly string[] scenePathsToLoad   = null; // Scenepaths to load in both modes (Single & Additive)
-        private readonly string[] scenePathsToUnload = null; // Scenepaths to unload after finishing loading @scenePathsToLoad scenes (only applicable for Additive load mode)
 
         private readonly string scenePathToSetActive = null; // Scenepath to be set active right after it finishes loading resource & initialize gameobject (must be one of @scenePathsToLoad)
         private readonly string transitionScenePath  = null; // Scenepath to be loaded in between scene loads
 
-        private readonly bool allowSceneActivation = true;   // Activate scene for initialization process when all @scenePathsToLoad finish loading resource 
+        private readonly bool allowSceneActivation   = true; // Activate scene for initialization process when all @scenePathsToLoad finish loading resource 
                                                              // (not to be confused with active scene)
 
         private readonly bool automaticallyUnloadTransitionScene = true; // Automatically unload @transitionScenePath after finishing loading @scenePathsToLoad (in both modes)
                                                                          // or after unloading @scenePathsToUnload (Additive mode only)
 
         public string[] ScenePathsToLoad   { get => scenePathsToLoad;   }
-        public string[] ScenePathsToUnload { get => scenePathsToUnload; }
 
         public string TransitionScenePath  { get => transitionScenePath;  }
         public string ScenePathToSetActive { get => scenePathToSetActive; }
@@ -93,14 +91,12 @@ namespace SceneTool
 
         #region Constructors
         public SceneLoadArg(SceneObject[] scenesToLoad,
-                            SceneObject[] scenesToUnload,
                             bool allowSceneActivation,
                             SceneObject sceneToSetActive,
                             SceneObject transitionScene,
                             bool automaticallyUnloadTransitionScene)
         {
             this.scenePathsToLoad     = GetPathFrom(scenesToLoad);
-            this.scenePathsToUnload   = GetPathFrom(scenesToUnload);
             this.allowSceneActivation = allowSceneActivation;
             this.scenePathToSetActive = GetPathFrom(sceneToSetActive);
             this.transitionScenePath  = GetPathFrom(transitionScene);
@@ -114,7 +110,6 @@ namespace SceneTool
         }
 
         public SceneLoadArg(string[] scenePathsToLoad,
-                            string[] scenePathsToUnload,
                             bool allowSceneActivation,
                             string scenePathToSetActive,
                             string transitionScenePath,
@@ -125,13 +120,6 @@ namespace SceneTool
                 this.scenePathsToLoad = new string[scenePathsToLoad.Length]; // Scene load happens across multiple frames so it's best to make readonly copy of original array 
                                                                              // (await for ImmutableArray brought into Unity)
                 scenePathsToLoad.CopyTo(this.scenePathsToLoad, 0);
-            }
-
-            if (scenePathsToUnload != null)
-            {
-                this.scenePathsToUnload = new string[scenePathsToUnload.Length]; // Scene unload happens across multiple frames so it's best to make readonly copy of original array 
-                                                                                 // (await for ImmutableArray brought into Unity)
-                scenePathsToUnload.CopyTo(this.scenePathsToUnload, 0);
             }
 
             this.allowSceneActivation = allowSceneActivation;
@@ -159,12 +147,6 @@ namespace SceneTool
                 if (scenePathsToLoad != null)
                 {
                     if (!IsValidPath(scenePathsToLoad))
-                        return false;
-                }
-
-                if (scenePathsToUnload != null)
-                {
-                    if (!IsValidPath(scenePathsToUnload))
                         return false;
                 }
 
@@ -203,8 +185,6 @@ namespace SceneTool
         public bool HasTransitionScene  { get => !string.IsNullOrEmpty(transitionScenePath);  }
         public bool HasSceneToSetActive { get => !string.IsNullOrEmpty(scenePathToSetActive); }
 
-        public bool UnloadScenesAfterLoad { get => scenePathsToUnload != null; }
-
         public int NumberOfScenesToLoad { get => scenePathsToLoad.Length; }
         public int ActiveSceneIndex { get => Array.IndexOf(scenePathsToLoad, scenePathToSetActive); }
         #endregion
@@ -215,22 +195,30 @@ namespace SceneTool
         #region Fields & Properties
         private readonly string[] scenePathsToUnload = null;
 
+        private readonly bool unloadUnusedAssets = false;
+
         public string[] ScenePathsToUnload { get => scenePathsToUnload; }
+
+        public bool UnloadUnusedAssets { get => unloadUnusedAssets; }
         #endregion
 
         #region Constructors
-        public SceneUnloadArg(string[] scenePathsToUnload)
+        public SceneUnloadArg(string[] scenePathsToUnload, bool unloadUnusedAsset)
         {
             if (scenePathsToUnload != null)
             {
                 this.scenePathsToUnload = new string[scenePathsToUnload.Length];
                 scenePathsToUnload.CopyTo(this.scenePathsToUnload, 0);
             }
+
+            this.unloadUnusedAssets = unloadUnusedAsset;
         }
 
-        public SceneUnloadArg(SceneObject[] scenesToUnload)
+        public SceneUnloadArg(SceneObject[] scenesToUnload, bool unloadUnusedAsset)
         {
             this.scenePathsToUnload = GetPathFrom(scenesToUnload);
+
+            this.unloadUnusedAssets = unloadUnusedAsset;
         }
         #endregion
 

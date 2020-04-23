@@ -138,8 +138,8 @@ namespace SceneTool
             sceneOperationQueue.Enqueue(Instance.UnloadSceneAsyncCoroutine(arg));
         }
 
-        public static void UnloadSceneAsync(params string[] scenePathsToUnload)  => UnloadSceneAsync(new SceneUnloadArg(scenePathsToUnload));
-        public static void UnloadSceneAsync(params SceneObject[] scenesToUnload) => UnloadSceneAsync(new SceneUnloadArg(scenesToUnload));
+        public static void UnloadSceneAsync(params string[] scenePathsToUnload)  => UnloadSceneAsync(new SceneUnloadArg(scenePathsToUnload, false));
+        public static void UnloadSceneAsync(params SceneObject[] scenesToUnload) => UnloadSceneAsync(new SceneUnloadArg(scenesToUnload, false));
 
         public static SceneUnloadInterface AddScenesToUnload(params string[] scenePathsToUnload)  => new SceneUnloadInterface().AddScenesToUnload(scenePathsToUnload);
         public static SceneUnloadInterface AddScenesToUnload(params SceneObject[] scenesToUnload) => new SceneUnloadInterface().AddScenesToUnload(scenesToUnload);
@@ -226,22 +226,8 @@ namespace SceneTool
 
             Completed.Invoke();
 
-            // TODO: clean up this mess
-            if (arg.UnloadScenesAfterLoad && IsLoaded(arg.ScenePathsToUnload))
-            {
-                foreach (var scenePath in arg.ScenePathsToUnload)
-                {
-                    Scene activeScene = SceneManager.GetActiveScene();
-
-                    if (activeScene.path.Equals(scenePath))
-                        SetActiveScene(arg.ScenePathsToLoad[0]);
-
-                    yield return StartCoroutine(UnloadSceneAsyncCoroutine(scenePath));
-                }
-            }
-
             if (arg.HasTransitionScene && arg.AutomaticallyUnloadTransitionScene)
-                yield return StartCoroutine(UnloadSceneAsyncCoroutine(arg.TransitionScenePath));
+                yield return StartCoroutine(UnloadSceneAsyncCoroutine(false, arg.TransitionScenePath));
         }
 
         private IEnumerator LoadSceneAsyncCoroutine(SceneLoadArg arg)
@@ -262,7 +248,7 @@ namespace SceneTool
             if (arg.HasTransitionScene)
                 yield return StartCoroutine(LoadAdditiveCoroutine(arg.TransitionScenePath));
 
-            yield return StartCoroutine(UnloadSceneAsyncCoroutine(scenePathsToUnload.ToArray()));
+            yield return StartCoroutine(UnloadSceneAsyncCoroutine(true, scenePathsToUnload.ToArray()));
 
             AllowSceneActivation = arg.AllowSceneActivation;
 
@@ -320,10 +306,10 @@ namespace SceneTool
 
             Completed.Invoke();
 
-            yield return StartCoroutine(UnloadSceneAsyncCoroutine(tempScene));
+            yield return SceneManager.UnloadSceneAsync(tempScene);
 
             if (arg.HasTransitionScene && arg.AutomaticallyUnloadTransitionScene)
-                yield return StartCoroutine(UnloadSceneAsyncCoroutine(arg.TransitionScenePath));
+                yield return StartCoroutine(UnloadSceneAsyncCoroutine(false, arg.TransitionScenePath));
         }
 
         private IEnumerator LoadAdditiveCoroutine(string loadingScenePath)
@@ -338,10 +324,10 @@ namespace SceneTool
 
         private IEnumerator UnloadSceneAsyncCoroutine(SceneUnloadArg arg)
         {
-            yield return StartCoroutine(UnloadSceneAsyncCoroutine(arg.ScenePathsToUnload));
+            yield return StartCoroutine(UnloadSceneAsyncCoroutine(arg.UnloadUnusedAssets, arg.ScenePathsToUnload));
         }
 
-        private IEnumerator UnloadSceneAsyncCoroutine(string[] scenePathsToUnload)
+        private IEnumerator UnloadSceneAsyncCoroutine(bool unloadUnusedAssets, params string[] scenePathsToUnload)
         {
             if (!IsLoaded(scenePathsToUnload))
                 yield break;
@@ -353,25 +339,12 @@ namespace SceneTool
                 while (!sceneUnloadOperation.isDone)
                     yield return null;
             }
-        }
 
-        private IEnumerator UnloadSceneAsyncCoroutine(string scenePathToUnload)
-        {
-            if (!IsLoaded(scenePathToUnload))
-                yield break;
-
-            AsyncOperation sceneUnloadOperation = SceneManager.UnloadSceneAsync(scenePathToUnload);
-
-            while (!sceneUnloadOperation.isDone)
-                yield return null;
-        }
-
-        private IEnumerator UnloadSceneAsyncCoroutine(Scene sceneToUnload)
-        {
-            AsyncOperation sceneUnloadOperation = SceneManager.UnloadSceneAsync(sceneToUnload);
-
-            while (!sceneUnloadOperation.isDone)
-                yield return null;
+            if (unloadUnusedAssets)
+            {
+                Debug.Log("Unload unused assets.");
+                yield return Resources.UnloadUnusedAssets();
+            }
         }
         #endregion
 
@@ -384,8 +357,7 @@ namespace SceneTool
 
                 if (!scene.isLoaded)
                 {
-                    Debug.LogError(scenePath + " is not loaded.");
-                    Debug.LogError("Unload operation is cancelled.");
+                    Debug.LogError(scenePath + " is not loaded.\nUnload operation is cancelled");
                     return false;
                 }
             }

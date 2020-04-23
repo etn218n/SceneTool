@@ -176,15 +176,15 @@ MonoBehaviour:
   LoadType: 6
   AllowSceneActivation: 1
   HasTransitionScene: 0
+  UnloadUnusedAssets: 1
   UnloadScenesAfterLoad: 0
   AutomaticallyUnloadTransitionScene: 0
   scenesToLoad:
   - sceneAsset: {fileID: 102900000, guid: 03cf6911b95f4754e8e6e21f9ba348bc, type: 3}
     path: Assets/SceneTool/Samples/Scenes/SettingMenu.unity
   scenesToUnload:
-  - sceneAsset: {fileID: 0}
-    path: 
-  scenesToUnloadAfterLoad: []
+  - sceneAsset: {fileID: 102900000, guid: 977ab475cc9eb2d4a9dcea899573a040, type: 3}
+    path: Assets/SceneTool/Samples/Scenes/StartMenu.unity
   transitionScene:
     sceneAsset: {fileID: 102900000, guid: 340bcd9576e830347bbbcce85b1a36cb, type: 3}
     path: Assets/SceneTool/Samples/Scenes/Loading.unity
@@ -743,6 +743,7 @@ MonoBehaviour:
   LoadType: 5
   AllowSceneActivation: 0
   HasTransitionScene: 1
+  UnloadUnusedAssets: 0
   UnloadScenesAfterLoad: 0
   AutomaticallyUnloadTransitionScene: 0
   scenesToLoad:
@@ -751,7 +752,6 @@ MonoBehaviour:
   scenesToUnload:
   - sceneAsset: {fileID: 0}
     path: 
-  scenesToUnloadAfterLoad: []
   transitionScene:
     sceneAsset: {fileID: 102900000, guid: 340bcd9576e830347bbbcce85b1a36cb, type: 3}
     path: Assets/SceneTool/Samples/Scenes/Loading.unity

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 
 namespace SceneTool
 {
@@ -11,10 +12,10 @@ namespace SceneTool
         private SerializedProperty scenesToLoadProperty;
         private SerializedProperty scenesToUnloadProperty;
         private SerializedProperty transitionSceneProperty;
+        private SerializedProperty unloadUnusedAssetsProperty;
         private SerializedProperty hasTransitionSceneProperty;
         private SerializedProperty allowSceneActivationProperty;
         private SerializedProperty unloadScenesAfterLoadProperty;
-        private SerializedProperty scenesToUnloadAfterLoadProperty;
         private SerializedProperty automaticallyUnloadTransitionSceneProperty;
 
         private SceneLoaderBehaviour behaviour;
@@ -28,10 +29,10 @@ namespace SceneTool
             scenesToLoadProperty = serializedObject.FindProperty("scenesToLoad");
             scenesToUnloadProperty = serializedObject.FindProperty("scenesToUnload");
             transitionSceneProperty = serializedObject.FindProperty("transitionScene");
+            unloadUnusedAssetsProperty = serializedObject.FindProperty("UnloadUnusedAssets");
             hasTransitionSceneProperty = serializedObject.FindProperty("HasTransitionScene");
             allowSceneActivationProperty = serializedObject.FindProperty("AllowSceneActivation");
             unloadScenesAfterLoadProperty = serializedObject.FindProperty("UnloadScenesAfterLoad");
-            scenesToUnloadAfterLoadProperty = serializedObject.FindProperty("scenesToUnloadAfterLoad");
             automaticallyUnloadTransitionSceneProperty = serializedObject.FindProperty("AutomaticallyUnloadTransitionScene");
 
             behaviour = (SceneLoaderBehaviour)target;
@@ -71,9 +72,19 @@ namespace SceneTool
                 case SceneActionType.LoadAdditiveScene: DrawLoadAdditiveScenePanel(); break;
                 case SceneActionType.LoadAdditiveSceneAsync: DrawLoadAdditiveSceneAsyncPanel(); break;
 
-                case SceneActionType.UnloadSceneAsync: DrawUnloadSceneAsyncPanel(scenesToUnloadProperty); break;
-                case SceneActionType.UnloadSelfAsync: break;
+                case SceneActionType.UnloadSceneAsync: DrawUnloadSceneAsyncPanel(); break;
+                case SceneActionType.UnloadSelfAsync:  DrawUnloadSelfAsyncPanel();  break;
             }
+        }
+
+        private void DrawUnloadSelfAsyncPanel()
+        {
+            GUILayout.Space(5);
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Unload Unused Assets"), GUILayout.Width(135f));
+            EditorGUILayout.PropertyField(unloadUnusedAssetsProperty, GUIContent.none);
+            EditorGUILayout.EndHorizontal();
         }
         #endregion
 
@@ -152,10 +163,7 @@ namespace SceneTool
             {
                 GUILayout.Space(5);
 
-                if (scenesToUnloadAfterLoadProperty.arraySize == 0)
-                    scenesToUnloadAfterLoadProperty.InsertArrayElementAtIndex(0);
-
-                DrawUnloadSceneAsyncPanel(scenesToUnloadAfterLoadProperty);
+                DrawUnloadSceneAsyncPanel();
             }
 
             GUILayout.Space(5);
@@ -191,44 +199,51 @@ namespace SceneTool
             GUILayout.Space(10);
         }
 
-        private void DrawUnloadSceneAsyncPanel(SerializedProperty property)
+        private void DrawUnloadSceneAsyncPanel()
         {
             // Draw add scene button
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent("Scene(s) to Unload"), GUILayout.Width(115));
             if (GUILayout.Button("+", GUILayout.Width(20)))
             {
-                property.InsertArrayElementAtIndex(property.arraySize);
+                scenesToUnloadProperty.InsertArrayElementAtIndex(scenesToUnloadProperty.arraySize);
 
-                property.GetArrayElementAtIndex(property.arraySize - 1).FindPropertyRelative("sceneAsset").objectReferenceValue = null;
+                scenesToUnloadProperty.GetArrayElementAtIndex(scenesToUnloadProperty.arraySize - 1).FindPropertyRelative("sceneAsset").objectReferenceValue = null;
             }
 
             // Draw the first SceneObject's sceneAsset on the same line with AddSceneButton
             EditorGUILayout.BeginVertical();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(property.GetArrayElementAtIndex(0), GUIContent.none, GUILayout.MinWidth(100));
+            EditorGUILayout.PropertyField(scenesToUnloadProperty.GetArrayElementAtIndex(0), GUIContent.none, GUILayout.MinWidth(100));
             EditorGUILayout.LabelField(GUIContent.none, GUILayout.Width(20));
             EditorGUILayout.EndHorizontal();
 
             // Draw other SceneObject's sceneAssets on the next line
-            for (int i = 1; i < property.arraySize; i++)
+            for (int i = 1; i < scenesToUnloadProperty.arraySize; i++)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.PropertyField(property.GetArrayElementAtIndex(i), GUIContent.none, GUILayout.MinWidth(100));
+                EditorGUILayout.PropertyField(scenesToUnloadProperty.GetArrayElementAtIndex(i), GUIContent.none, GUILayout.MinWidth(100));
 
                 if (GUILayout.Button("-", GUILayout.Width(20)))
                 {
                     // Delete twice due to weird bug by Unity involving array deletion. 
                     // Element of array gets cleared to null in the first call instead of actual delete.
-                    int oldsize = property.arraySize;
-                    property.DeleteArrayElementAtIndex(i);
+                    int oldsize = scenesToUnloadProperty.arraySize;
+                    scenesToUnloadProperty.DeleteArrayElementAtIndex(i);
 
-                    if (oldsize == property.arraySize)
-                        property.DeleteArrayElementAtIndex(i);
+                    if (oldsize == scenesToUnloadProperty.arraySize)
+                        scenesToUnloadProperty.DeleteArrayElementAtIndex(i);
                 }
                 EditorGUILayout.EndHorizontal();
             }
             EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Unload Unused Assets"), GUILayout.Width(135f));
+            EditorGUILayout.PropertyField(unloadUnusedAssetsProperty, GUIContent.none);
             EditorGUILayout.EndHorizontal();
         }
         #endregion

@@ -9,7 +9,6 @@ namespace SceneTool
         // Cache mutable setting
         #region Fields & Properties
         private string[] scenePathsToLoad   = null;
-        private string[] scenePathsToUnload = null;
 
         private string transitionScenePath  = null;
         private string scenePathToSetActive = null;
@@ -36,28 +35,6 @@ namespace SceneTool
                     scenePaths.Add(scene.Path);
 
                 this.scenePathsToLoad = scenePaths.ToArray();
-            }
-
-            return this;
-        }
-
-        public SceneLoadInterface ThenUnloadScenes(params string[] scenePathsToUnload)
-        {
-            this.scenePathsToUnload = scenePathsToUnload;
-
-            return this;
-        }
-
-        public SceneLoadInterface ThenUnloadScenes(params SceneObject[] scenesToUnload)
-        {
-            if (scenesToUnload != null)
-            {
-                List<string> scenePaths = new List<string>();
-
-                foreach (var scene in scenesToUnload)
-                    scenePaths.Add(scene.Path);
-
-                this.scenePathsToUnload = scenePaths.ToArray();
             }
 
             return this;
@@ -112,7 +89,6 @@ namespace SceneTool
         public void StartLoadingSceneAsync()
         {
             SceneLoader.LoadSceneAsync(new SceneLoadArg(scenePathsToLoad, 
-                                                        scenePathsToUnload, 
                                                         allowSceneActivation, 
                                                         scenePathToSetActive, 
                                                         transitionScenePath, 
@@ -122,7 +98,6 @@ namespace SceneTool
         public void StartLoadingAdditiveSceneAsync()
         {
             SceneLoader.LoadAdditiveSceneAsync(new SceneLoadArg(scenePathsToLoad,
-                                                                scenePathsToUnload,
                                                                 allowSceneActivation,
                                                                 scenePathToSetActive,
                                                                 transitionScenePath,
@@ -136,6 +111,8 @@ namespace SceneTool
         // Cache mutable setting
         #region Fields & Properties
         private string[] scenePathsToUnload = null;
+
+        private bool unloadUnusedAsset = false;
         #endregion
 
         #region Fluent Interfaces
@@ -160,12 +137,19 @@ namespace SceneTool
 
             return this;
         }
+
+        public SceneUnloadInterface UnloadUnusedAsset(bool value)
+        {
+            this.unloadUnusedAsset = value;
+
+            return this;
+        }
         #endregion
 
         #region Scene Unload Delegation
         public void StartUnloadingSceneAsync()
         {
-            SceneLoader.UnloadSceneAsync(scenePathsToUnload);
+            SceneLoader.UnloadSceneAsync(new SceneUnloadArg(scenePathsToUnload, unloadUnusedAsset));
         }
         #endregion
     }
