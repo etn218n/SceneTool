@@ -54,6 +54,10 @@ namespace SceneTool
         {
             EditorApplication.update -= WarnBuildSetting;
 
+            // Get scenepath after deserialization in case sceneAsset file change directory
+            if (sceneAsset != null)
+                path = AssetDatabase.GetAssetPath(sceneAsset);
+
             if (string.IsNullOrEmpty(path))
                 return;
 
