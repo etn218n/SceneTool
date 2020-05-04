@@ -1,0 +1,15 @@
+{
+    "name": "SceneToolSamples",
+    "references": [
+        "GUID:877a83b35bdc10f438746d738112cd05"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
