@@ -15,17 +15,11 @@ namespace SceneTool
         public bool UnloadScenesAfterLoad = false;
         public bool AutomaticallyUnloadTransitionScene = true;
 
-        [SerializeField]
-        private SceneObject[] scenesToLoad = null;
+        [SerializeField] private SceneObject[] scenesToLoad   = null;
+        [SerializeField] private SceneObject[] scenesToUnload = null;
 
-        [SerializeField]
-        private SceneObject[] scenesToUnload = null;
-
-        [SerializeField]
-        private SceneObject transitionScene = null;
-
-        [SerializeField]
-        private SceneObject sceneToSetActive = null;
+        [SerializeField] private SceneObject transitionScene  = null;
+        [SerializeField] private SceneObject sceneToSetActive = null;
 
         public void Execute()
         {

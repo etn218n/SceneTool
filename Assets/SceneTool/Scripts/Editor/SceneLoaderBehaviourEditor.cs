@@ -9,6 +9,7 @@ namespace SceneTool
     {
         #region Fields & Properties
         private SerializedProperty loadTypeProperty;
+        private SerializedProperty sceneToSetActive;
         private SerializedProperty scenesToLoadProperty;
         private SerializedProperty scenesToUnloadProperty;
         private SerializedProperty transitionSceneProperty;
@@ -26,6 +27,7 @@ namespace SceneTool
         private void OnEnable()
         {
             loadTypeProperty = serializedObject.FindProperty("LoadType");
+            sceneToSetActive = serializedObject.FindProperty("sceneToSetActive");
             scenesToLoadProperty = serializedObject.FindProperty("scenesToLoad");
             scenesToUnloadProperty = serializedObject.FindProperty("scenesToUnload");
             transitionSceneProperty = serializedObject.FindProperty("transitionScene");
@@ -137,6 +139,12 @@ namespace SceneTool
             EditorGUILayout.LabelField(new GUIContent("Allow Scene Activation"), GUILayout.Width(135f));
             EditorGUILayout.PropertyField(allowSceneActivationProperty, GUIContent.none);
             EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // Draw Scene to be set active
+            if (behaviour.LoadType == SceneActionType.LoadAdditiveSceneAsync || scenesToLoadProperty.arraySize > 1)
+                EditorGUILayout.PropertyField(sceneToSetActive, new GUIContent("Active Scene"));
 
             GUILayout.Space(10);
 
