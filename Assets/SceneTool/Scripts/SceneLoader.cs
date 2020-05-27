@@ -329,11 +329,11 @@ namespace SceneTool
 
         private IEnumerator UnloadSceneAsyncCoroutine(bool unloadUnusedAssets, params string[] scenePathsToUnload)
         {
-            if (!IsLoaded(scenePathsToUnload))
-                yield break;
-
             foreach (var scenePath in scenePathsToUnload)
             {
+                if (!IsLoaded(scenePath))
+                    continue;
+
                 AsyncOperation sceneUnloadOperation = SceneManager.UnloadSceneAsync(scenePath);
 
                 while (!sceneUnloadOperation.isDone)
@@ -357,7 +357,7 @@ namespace SceneTool
 
                 if (!scene.isLoaded)
                 {
-                    Debug.LogError(scenePath + " is not loaded.\nUnload operation is cancelled");
+                    Debug.Log(scenePath + " is not loaded.");
                     return false;
                 }
             }
