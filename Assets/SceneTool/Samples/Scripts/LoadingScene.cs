@@ -15,7 +15,6 @@ public class LoadingScene : MonoBehaviour
         pressAnyKeyText.SetActive(false);
 
         SceneLoader.Updated.AddListener(OnProgressUpdated);
-        SceneLoader.Completed.AddListener(OnProgressCompleted);
     }
 
     private void Update()
@@ -27,7 +26,6 @@ public class LoadingScene : MonoBehaviour
     private void OnDestroy()
     {
         SceneLoader.Updated.RemoveListener(OnProgressUpdated);
-        SceneLoader.Completed.RemoveListener(OnProgressCompleted);
     }
 
     private void OnProgressUpdated(float progress)
@@ -36,10 +34,5 @@ public class LoadingScene : MonoBehaviour
 
         if (!SceneLoader.AllowSceneActivation && progress == 0.9f)
             pressAnyKeyText.SetActive(true);
-    }
-
-    private void OnProgressCompleted()
-    {
-        SceneLoader.UnloadSceneAsync(this.gameObject.scene.path);
     }
 }

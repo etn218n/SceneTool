@@ -2,12 +2,12 @@
 
 namespace SceneTool
 {
-    public enum SceneBehaviourType { None, UnloadSceneAsync, UnloadSelfAsync, LoadScene, LoadAdditiveScene, LoadSceneAsync, LoadAdditiveSceneAsync }
+    public enum SceneActionType { None, UnloadSceneAsync, LoadScene, LoadAdditiveScene, LoadSceneAsync, LoadAdditiveSceneAsync }
 
-    [DisallowMultipleComponent]
-    public class SceneLoaderBehaviour : MonoBehaviour
+    [CreateAssetMenu(fileName = "SceneLoaderAction", menuName = "SceneLoader/SceneLoaderAction")]
+    public class SceneLoaderAction : ScriptableObject
     {
-        public SceneBehaviourType LoadType = SceneBehaviourType.None;
+        public SceneActionType LoadType = SceneActionType.None;
 
         public bool AllowSceneActivation  = true;
         public bool HasTransitionScene    = false;
@@ -15,18 +15,18 @@ namespace SceneTool
         public bool UnloadScenesAfterLoad = false;
         public bool AutomaticallyUnloadTransitionScene = true;
 
-        [SerializeField] private SceneObject[] scenesToLoad   = null;
+        [SerializeField] private SceneObject[] scenesToLoad = null;
         [SerializeField] private SceneObject[] scenesToUnload = null;
 
-        [SerializeField] private SceneObject transitionScene  = null;
+        [SerializeField] private SceneObject transitionScene = null;
         [SerializeField] private SceneObject sceneToSetActive = null;
 
         public void Execute()
         {
-            if (LoadType == SceneBehaviourType.None)
+            if (LoadType == SceneActionType.None)
                 return;
 
-            if (!HasTransitionScene) 
+            if (!HasTransitionScene)
                 transitionScene = null; // nullify SceneObject ghost instance by Unity custom editor
 
             if (sceneToSetActive != null && !sceneToSetActive.IsValid())
@@ -34,14 +34,13 @@ namespace SceneTool
 
             switch (LoadType)
             {
-                case SceneBehaviourType.LoadScene: LoadScene(); break;
-                case SceneBehaviourType.LoadSceneAsync: LoadSceneAsync(); break;
+                case SceneActionType.LoadScene: LoadScene(); break;
+                case SceneActionType.LoadSceneAsync: LoadSceneAsync(); break;
 
-                case SceneBehaviourType.LoadAdditiveScene: LoadAdditiveScene(); break;
-                case SceneBehaviourType.LoadAdditiveSceneAsync: LoadAdditiveSceneAsync(); break;
+                case SceneActionType.LoadAdditiveScene: LoadAdditiveScene(); break;
+                case SceneActionType.LoadAdditiveSceneAsync: LoadAdditiveSceneAsync(); break;
 
-                case SceneBehaviourType.UnloadSceneAsync: UnloadSceneAsync(); break;
-                case SceneBehaviourType.UnloadSelfAsync:  UnloadSelfAsync();  break;
+                case SceneActionType.UnloadSceneAsync: UnloadSceneAsync(); break;
 
                 default: break;
             }
@@ -71,9 +70,6 @@ namespace SceneTool
         }
 
         private void UnloadSceneAsync() => SceneLoader.AddScenesToUnload(scenesToUnload)
-                                                      .UnloadUnusedAsset(UnloadUnusedAssets)
-                                                      .StartUnloadingSceneAsync();
-        private void UnloadSelfAsync()  => SceneLoader.AddScenesToUnload(this.gameObject.scene.path)
                                                       .UnloadUnusedAsset(UnloadUnusedAssets)
                                                       .StartUnloadingSceneAsync();
     }

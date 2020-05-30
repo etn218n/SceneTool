@@ -3,8 +3,8 @@ using UnityEditor;
 
 namespace SceneTool
 {
-    [CustomEditor(typeof(SceneLoaderBehaviour))]
-    public class SceneLoaderBehaviourEditor : Editor
+    [CustomEditor(typeof(SceneLoaderAction))]
+    public class SceneLoaderActionEditor : Editor
     {
         #region Fields & Properties
         private SerializedProperty loadTypeProperty;
@@ -18,7 +18,7 @@ namespace SceneTool
         private SerializedProperty unloadScenesAfterLoadProperty;
         private SerializedProperty automaticallyUnloadTransitionSceneProperty;
 
-        private SceneLoaderBehaviour behaviour;
+        private SceneLoaderAction action;
 
         #endregion
 
@@ -36,7 +36,7 @@ namespace SceneTool
             unloadScenesAfterLoadProperty = serializedObject.FindProperty("UnloadScenesAfterLoad");
             automaticallyUnloadTransitionSceneProperty = serializedObject.FindProperty("AutomaticallyUnloadTransitionScene");
 
-            behaviour = (SceneLoaderBehaviour)target;
+            action = (SceneLoaderAction)target;
 
             if (scenesToLoadProperty.arraySize == 0)
                 scenesToLoadProperty.InsertArrayElementAtIndex(0);
@@ -65,27 +65,16 @@ namespace SceneTool
 
             GUILayout.Space(5);
 
-            switch (behaviour.LoadType)
+            switch (action.LoadType)
             {
-                case SceneBehaviourType.LoadScene: DrawLoadScenePanel(); break;
-                case SceneBehaviourType.LoadSceneAsync: DrawLoadSceneAsyncPanel(); break;
+                case SceneActionType.LoadScene: DrawLoadScenePanel(); break;
+                case SceneActionType.LoadSceneAsync: DrawLoadSceneAsyncPanel(); break;
 
-                case SceneBehaviourType.LoadAdditiveScene: DrawLoadAdditiveScenePanel(); break;
-                case SceneBehaviourType.LoadAdditiveSceneAsync: DrawLoadAdditiveSceneAsyncPanel(); break;
+                case SceneActionType.LoadAdditiveScene: DrawLoadAdditiveScenePanel(); break;
+                case SceneActionType.LoadAdditiveSceneAsync: DrawLoadAdditiveSceneAsyncPanel(); break;
 
-                case SceneBehaviourType.UnloadSceneAsync: DrawUnloadSceneAsyncPanel(); break;
-                case SceneBehaviourType.UnloadSelfAsync:  DrawUnloadSelfAsyncPanel();  break;
+                case SceneActionType.UnloadSceneAsync: DrawUnloadSceneAsyncPanel(); break;
             }
-        }
-
-        private void DrawUnloadSelfAsyncPanel()
-        {
-            GUILayout.Space(5);
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Unload Unused Assets"), GUILayout.Width(135f));
-            EditorGUILayout.PropertyField(unloadUnusedAssetsProperty, GUIContent.none);
-            EditorGUILayout.EndHorizontal();
         }
         #endregion
 
@@ -142,7 +131,7 @@ namespace SceneTool
             GUILayout.Space(10);
 
             // Draw Scene to be set active
-            if (behaviour.LoadType == SceneBehaviourType.LoadAdditiveSceneAsync || scenesToLoadProperty.arraySize > 1)
+            if (action.LoadType == SceneActionType.LoadAdditiveSceneAsync || scenesToLoadProperty.arraySize > 1)
                 EditorGUILayout.PropertyField(sceneToSetActive, new GUIContent("Active Scene"));
 
             GUILayout.Space(10);
