@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 
 namespace SceneTool
 {
@@ -67,15 +68,14 @@ namespace SceneTool
 
             switch (action.LoadType)
             {
-                case SceneActionType.LoadScene: DrawLoadScenePanel(); break;
                 case SceneActionType.LoadSceneAsync: DrawLoadSceneAsyncPanel(); break;
-
-                case SceneActionType.LoadAdditiveScene: DrawLoadAdditiveScenePanel(); break;
                 case SceneActionType.LoadAdditiveSceneAsync: DrawLoadAdditiveSceneAsyncPanel(); break;
+                case SceneActionType.LoadPreviousSceneAsync: DrawLoadPreviousSceneAsyncPanel(); break;
 
                 case SceneActionType.UnloadSceneAsync: DrawUnloadSceneAsyncPanel(); break;
             }
         }
+
         #endregion
 
         #region Draw Asynchronous Operation Panels
@@ -195,6 +195,33 @@ namespace SceneTool
             GUILayout.Space(10);
         }
 
+        private void DrawLoadPreviousSceneAsyncPanel()
+        {
+            GUILayout.Space(5);
+
+            // Draw header
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Load"), EditorStyles.boldLabel);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Allow Scene Activation"), GUILayout.Width(135f));
+            EditorGUILayout.PropertyField(allowSceneActivationProperty, GUIContent.none);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // Draw Scene to be set active
+            if (action.LoadType == SceneActionType.LoadAdditiveSceneAsync || scenesToLoadProperty.arraySize > 1)
+                EditorGUILayout.PropertyField(sceneToSetActive, new GUIContent("Active Scene"));
+
+            GUILayout.Space(10);
+
+            DrawTransitionScenePanel();
+        }
+
         private void DrawUnloadSceneAsyncPanel()
         {
             // Draw add scene button
@@ -242,18 +269,6 @@ namespace SceneTool
             EditorGUILayout.PropertyField(unloadUnusedAssetsProperty, GUIContent.none);
             EditorGUILayout.EndHorizontal();
         }
-        #endregion
-
-        #region Draw Synchronous Operation Panels
-        private void DrawLoadScenePanel()
-        {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Scene to Load"), GUILayout.Width(100));
-            EditorGUILayout.PropertyField(scenesToLoadProperty.GetArrayElementAtIndex(0), GUIContent.none);
-            EditorGUILayout.EndHorizontal();
-        }
-
-        private void DrawLoadAdditiveScenePanel() => DrawLoadScenePanel();
         #endregion
     }
 }

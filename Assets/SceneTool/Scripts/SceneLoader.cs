@@ -15,6 +15,9 @@ namespace SceneTool
         public static UnityFloatEvent Updated { get; private set; } = new UnityFloatEvent();
         public static UnityEvent    Completed { get; private set; } = new UnityEvent();
 
+        public static string PreviousScene { get; private set; } = string.Empty;
+        public static string SourceScene   { get; private set; } = string.Empty;
+
         public static float Progress { get; private set; } = 0.0f;
 
         public static bool IsLoading { get; private set; } = false;
@@ -40,8 +43,6 @@ namespace SceneTool
 
             IsLoading = true;
             Instance  = this;
-
-            DontDestroyOnLoad(Instance.gameObject);
         }
 
         private void Start()
@@ -89,7 +90,13 @@ namespace SceneTool
 
             if (!IsLoading)
             {
-                new GameObject("Scene Progress").AddComponent<SceneLoader>();
+                GameObject gameObj = new GameObject("Scene Progress");
+                gameObj.AddComponent<SceneLoader>();
+
+                PreviousScene    = gameObj.scene.path;
+                SourceScene = gameObj.scene.path;
+
+                DontDestroyOnLoad(gameObj);
             }
 
             sceneOperationQueue.Enqueue(Instance.LoadSceneAsyncCoroutine(arg));
@@ -105,7 +112,12 @@ namespace SceneTool
 
             if (!IsLoading)
             {
-                new GameObject("Scene Progress").AddComponent<SceneLoader>();
+                GameObject gameObj = new GameObject("Scene Progress");
+                gameObj.AddComponent<SceneLoader>();
+                
+                SourceScene = gameObj.scene.path;
+
+                DontDestroyOnLoad(gameObj);
             }
 
             sceneOperationQueue.Enqueue(Instance.LoadAdditiveSceneAsyncCoroutine(arg));
@@ -132,7 +144,12 @@ namespace SceneTool
 
             if (!IsLoading)
             {
-                new GameObject("Scene Progress").AddComponent<SceneLoader>();
+                GameObject gameObj = new GameObject("Scene Progress");
+                gameObj.AddComponent<SceneLoader>();
+
+                SourceScene = gameObj.scene.path;
+
+                DontDestroyOnLoad(gameObj);
             }
 
             sceneOperationQueue.Enqueue(Instance.UnloadSceneAsyncCoroutine(arg));
@@ -143,29 +160,6 @@ namespace SceneTool
 
         public static SceneUnloadInterface AddScenesToUnload(params string[] scenePathsToUnload)  => new SceneUnloadInterface().AddScenesToUnload(scenePathsToUnload);
         public static SceneUnloadInterface AddScenesToUnload(params SceneObject[] scenesToUnload) => new SceneUnloadInterface().AddScenesToUnload(scenesToUnload);
-        #endregion
-
-        #region Synchronous Scene Load
-        private static void LoadScene(string scenePathToLoad, LoadSceneMode mode)
-        {
-            if (IsLoading)
-                return;
-
-            SceneManager.LoadScene(scenePathToLoad, mode);
-
-            Destroy(Instance.gameObject);
-        }
-
-        private static void LoadScene(SceneObject sceneToLoad, LoadSceneMode mode)
-        {
-            LoadScene(sceneToLoad.Path, mode);
-        }
-
-        public static void LoadScene(string scenePathToload)  => LoadScene(scenePathToload, LoadSceneMode.Single);
-        public static void LoadScene(SceneObject sceneToLoad) => LoadScene(sceneToLoad, LoadSceneMode.Single);
-
-        public static void LoadAdditiveScene(string scenePathToload)  => LoadScene(scenePathToload, LoadSceneMode.Additive);
-        public static void LoadAdditiveScene(SceneObject sceneToLoad) => LoadScene(sceneToLoad, LoadSceneMode.Additive);
         #endregion
 
         #region Coroutines
@@ -248,7 +242,7 @@ namespace SceneTool
             if (arg.HasTransitionScene)
                 yield return StartCoroutine(LoadAdditiveCoroutine(arg.TransitionScenePath));
 
-            yield return StartCoroutine(UnloadSceneAsyncCoroutine(true, scenePathsToUnload.ToArray()));
+            yield return StartCoroutine(UnloadSceneAsyncCoroutine(false, scenePathsToUnload.ToArray()));
 
             AllowSceneActivation = arg.AllowSceneActivation;
 

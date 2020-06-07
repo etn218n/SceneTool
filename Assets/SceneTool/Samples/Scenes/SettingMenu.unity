@@ -173,10 +173,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb237a1c65228d409dfa9b4ffce959b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LoadType: 1
+  LoadType: 2
   AllowSceneActivation: 1
   HasTransitionScene: 0
-  UnloadUnusedAssets: 1
+  UnloadUnusedAssets: 0
   UnloadScenesAfterLoad: 0
   AutomaticallyUnloadTransitionScene: 1
   scenesToLoad:

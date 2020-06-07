@@ -15,6 +15,8 @@ public class LoadingScene : MonoBehaviour
         pressAnyKeyText.SetActive(false);
 
         SceneLoader.Updated.AddListener(OnProgressUpdated);
+
+        Debug.Log("Previous scene: " + SceneLoader.PreviousScene);
     }
 
     private void Update()

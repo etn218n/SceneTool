@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb237a1c65228d409dfa9b4ffce959b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LoadType: 6
+  LoadType: 4
   AllowSceneActivation: 1
   HasTransitionScene: 0
   UnloadUnusedAssets: 1
@@ -681,7 +681,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11400000, guid: c2faae306085c7440902df1543a77149, type: 2}
+      - m_Target: {fileID: 1346248751}
         m_MethodName: Execute
         m_Mode: 1
         m_Arguments:
@@ -740,12 +740,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb237a1c65228d409dfa9b4ffce959b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LoadType: 5
+  LoadType: 3
   AllowSceneActivation: 0
   HasTransitionScene: 1
   UnloadUnusedAssets: 0
   UnloadScenesAfterLoad: 0
-  AutomaticallyUnloadTransitionScene: 0
+  AutomaticallyUnloadTransitionScene: 1
   scenesToLoad:
   - sceneAsset: {fileID: 102900000, guid: 9e6fe8d4449681040b44a63224b39292, type: 3}
     path: Assets/SceneTool/Samples/Scenes/Level1.unity

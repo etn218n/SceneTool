@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SceneTool
 {
-    public enum SceneActionType { None, UnloadSceneAsync, LoadScene, LoadAdditiveScene, LoadSceneAsync, LoadAdditiveSceneAsync }
+    public enum SceneActionType { None, UnloadSceneAsync, LoadSceneAsync, LoadAdditiveSceneAsync, LoadPreviousSceneAsync }
 
     [CreateAssetMenu(fileName = "SceneLoaderAction", menuName = "SceneLoader/SceneLoaderAction")]
     public class SceneLoaderAction : ScriptableObject
@@ -15,10 +16,10 @@ namespace SceneTool
         public bool UnloadScenesAfterLoad = false;
         public bool AutomaticallyUnloadTransitionScene = true;
 
-        [SerializeField] private SceneObject[] scenesToLoad = null;
+        [SerializeField] private SceneObject[] scenesToLoad   = null;
         [SerializeField] private SceneObject[] scenesToUnload = null;
 
-        [SerializeField] private SceneObject transitionScene = null;
+        [SerializeField] private SceneObject transitionScene  = null;
         [SerializeField] private SceneObject sceneToSetActive = null;
 
         public void Execute()
@@ -34,11 +35,9 @@ namespace SceneTool
 
             switch (LoadType)
             {
-                case SceneActionType.LoadScene: LoadScene(); break;
                 case SceneActionType.LoadSceneAsync: LoadSceneAsync(); break;
-
-                case SceneActionType.LoadAdditiveScene: LoadAdditiveScene(); break;
                 case SceneActionType.LoadAdditiveSceneAsync: LoadAdditiveSceneAsync(); break;
+                case SceneActionType.LoadPreviousSceneAsync: LoadPreviousSceneAsync(); break;
 
                 case SceneActionType.UnloadSceneAsync: UnloadSceneAsync(); break;
 
@@ -46,13 +45,13 @@ namespace SceneTool
             }
         }
 
-        private void LoadScene() => SceneLoader.LoadScene(scenesToLoad[0]);
-        private void LoadAdditiveScene() => SceneLoader.LoadAdditiveScene(scenesToLoad[0]);
-
-        private void LoadSceneAsync() => SceneLoader.AddScenesToLoad(scenesToLoad).AllowSceneActivation(AllowSceneActivation)
-                                                    .SetActiveScene(sceneToSetActive)
-                                                    .HasTransitionScene(transitionScene).AutomaticallyUnloadTransitionScene(AutomaticallyUnloadTransitionScene)
-                                                    .StartLoadingSceneAsync();
+        private void LoadSceneAsync()
+        {
+            SceneLoader.AddScenesToLoad(scenesToLoad).AllowSceneActivation(AllowSceneActivation)
+                       .SetActiveScene(sceneToSetActive)
+                       .HasTransitionScene(transitionScene).AutomaticallyUnloadTransitionScene(AutomaticallyUnloadTransitionScene)
+                       .StartLoadingSceneAsync();
+        }
 
         private void LoadAdditiveSceneAsync()
         {
@@ -69,8 +68,18 @@ namespace SceneTool
             }
         }
 
-        private void UnloadSceneAsync() => SceneLoader.AddScenesToUnload(scenesToUnload)
-                                                      .UnloadUnusedAsset(UnloadUnusedAssets)
-                                                      .StartUnloadingSceneAsync();
+        private void LoadPreviousSceneAsync()
+        {
+            SceneLoader.AddScenesToLoad(SceneLoader.PreviousScene).AllowSceneActivation(AllowSceneActivation)
+                       .HasTransitionScene(transitionScene).AutomaticallyUnloadTransitionScene(AutomaticallyUnloadTransitionScene)
+                       .StartLoadingSceneAsync();
+        }
+
+        private void UnloadSceneAsync()
+        {
+            SceneLoader.AddScenesToUnload(scenesToUnload)
+                       .UnloadUnusedAsset(UnloadUnusedAssets)
+                       .StartUnloadingSceneAsync();
+        }
     }
 }
